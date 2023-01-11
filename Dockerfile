@@ -7,6 +7,7 @@ COPY . /app
 
 # Setup env
 ENV ALLOW_EMPTY_PASSWORD=yes
+ENV APP_ENV=prod
 
 RUN mkdir -p var && \
     # avoid 'php\r': No such file or directory"
