@@ -7,13 +7,12 @@ COPY . /app
 
 # Setup env
 ENV ALLOW_EMPTY_PASSWORD=yes
-ENV COMPOSER_ALLOW_SUPERUSER=1
 
 RUN mkdir -p var && \
     # avoid 'php\r': No such file or directory"
     sed -i 's/\r$//' bin/console && \
     chmod +x bin/console && \
-    composer dump-env prod --empty && \
+    echo "<?php return [];" > .env.local.php && \
     # Install dependencies
     APP_ENV=prod composer install --prefer-dist --optimize-autoloader --classmap-authoritative --no-interaction --no-ansi --no-dev && \
     APP_ENV=prod bin/console cache:clear --no-warmup && \
