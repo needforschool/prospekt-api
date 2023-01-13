@@ -48,6 +48,24 @@ class ApiController extends AbstractController
         return $this->json($data, Response::HTTP_OK);      
     
     }
+    #[Route('/api/create', name: 'app_api_create', methods: ['PUT'])]
+    public function create(Request $request, ManagerRegistry $doctrine)
+    {
+        $entityManager = $doctrine->getManager();
 
-    
+        $data = json_decode($request->getContent(), true);
+
+        $user =new User();
+        $user   ->setEmail($data['email'])
+                ->setName($data['name'])
+                ->setTel($data['tel'])
+                ->setType($data['type'])
+                ->setSiret($data['siret'])
+                ->setVat($data['vat']);
+
+        $entityManager->persist($user);
+        $entityManager->flush();
+        return new JsonResponse('success');
+    }
+
 }
