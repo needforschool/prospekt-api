@@ -35,8 +35,6 @@ RUN chmod +x bin/console
 RUN chown root:root bin/console
 RUN mkdir -p var && \
     APP_ENV=prod composer install --prefer-dist --optimize-autoloader --classmap-authoritative --no-interaction --no-ansi --no-dev --no-plugins --no-scripts && \
-    APP_ENV=prod bin/console cache:clear --no-warmup && \
-    APP_ENV=prod bin/console cache:warmup && \
     # We don't use DotEnv component as docker-compose will provide real environment variables
     echo "<?php return [];" > .env.local.php && \
     mkdir -p var/storage && \
