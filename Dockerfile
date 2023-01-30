@@ -29,6 +29,10 @@ RUN docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/i
     docker-php-ext-install gd exif && \
     docker-php-ext-enable imagick
 
+    
+COPY apache.conf /etc/apache2/sites-available/000-default.conf
+RUN a2enmod rewrite
+
 COPY . /app
 
 RUN chmod +x bin/console
