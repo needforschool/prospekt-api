@@ -275,4 +275,23 @@ class User
 
         return $this;
     }
+
+    public function getInfos() {
+        return array(
+            'id'      => $this->getId(),
+            'type'   => $this->getType(),
+            'email' => $this->getEmail(),
+            'tel' => $this->getTel(),
+            'name' => $this->getName(),
+            'password' => $this->getPassword(),
+            'token' => $this->getToken(),
+            'siret' => $this->getSiret(),
+            'vat' => $this->getVat(),
+            'updated_at' => $this->getUpdatedAt(),
+            'created_at' => $this->getCreatedAt()
+
+        );
+    }
+
+    
 }
