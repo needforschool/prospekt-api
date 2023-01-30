@@ -41,3 +41,5 @@ RUN mkdir -p var && \
     chown -R www-data:www-data var && \
     # Reduce container size
     rm -rf .git assets /root/.composer /tmp/*
+
+RUN chmod +x bin/console
