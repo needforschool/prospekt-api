@@ -31,6 +31,7 @@ RUN docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/i
 
 COPY . /app
 
+RUN chmod +x bin/console
 RUN mkdir -p var && \
     APP_ENV=prod composer install --prefer-dist --optimize-autoloader --classmap-authoritative --no-interaction --no-ansi --no-dev --no-plugins --no-scripts --no-suggest && \
     APP_ENV=prod bin/console cache:clear --no-warmup && \
@@ -41,5 +42,3 @@ RUN mkdir -p var && \
     chown -R www-data:www-data var && \
     # Reduce container size
     rm -rf .git assets /root/.composer /tmp/*
-
-RUN chmod +x bin/console
