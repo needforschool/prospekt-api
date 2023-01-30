@@ -4,6 +4,7 @@ FROM silarhi/php-apache:8.1-symfony
 
 # 2nd stage : build the real app container
 EXPOSE 80
+EXPOSE 443
 WORKDIR /app
 
 # Default APP_VERSION, real version will be given by the CD server
