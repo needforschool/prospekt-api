@@ -32,7 +32,7 @@ RUN docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/i
 COPY . /app
 
 RUN mkdir -p var && \
-    APP_ENV=prod composer install --prefer-dist --optimize-autoloader --classmap-authoritative --no-interaction --no-ansi --no-dev --no-plugins --no-suggest && \
+    APP_ENV=prod composer install --prefer-dist --optimize-autoloader --classmap-authoritative --no-interaction --no-ansi --no-dev --no-plugins --no-scripts --no-suggest && \
     APP_ENV=prod bin/console cache:clear --no-warmup && \
     APP_ENV=prod bin/console cache:warmup && \
     # We don't use DotEnv component as docker-compose will provide real environment variables
