@@ -42,4 +42,43 @@ class InvoiceController extends AbstractController
         return $this->json(['status' => 'success'], Response::HTTP_OK);
 
     }
+
+    #[Route('/invoiceDelete/{id}', name: 'app_invoice', methods: ['DELETE'])]
+    public function deleteInvoice(Request $request,ManagerRegistry $doctrine, int $id): Response {
+
+        $entityManager = $doctrine->getManager();
+
+        $data = json_decode($request->getContent(), true);
+
+        $user = $doctrine->getRepository(User::class)->find($data['idCustomer']);
+
+        $invoice = $doctrine->getRepository(Invoice::class)->find($id);
+
+        $entityManager->remove($invoice);
+        $entityManager->flush();
+        return $this->json(['status' => 'success'], Response::HTTP_OK);
+
+    }
+
+    #[Route('/invoiceUpdate/{id}', name: 'app_invoice', methods: ['DELETE'])]
+    public function updateInvoice(Request $request,ManagerRegistry $doctrine, int $id): Response {
+
+        $entityManager = $doctrine->getManager();
+
+        $data = json_decode($request->getContent(), true);
+
+        $user = $doctrine->getRepository(User::class)->find($data['idCustomer']);
+
+        $invoice = $doctrine->getRepository(Invoice::class)->find($id);
+
+
+
+
+        $entityManager->remove($invoice);
+        $entityManager->flush();
+
+        return $this->json(['status' => 'success'], Response::HTTP_OK);
+
+    }
+
 }
