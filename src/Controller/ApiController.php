@@ -27,27 +27,6 @@ class ApiController extends AbstractController
 
     }
 
-    #[Route('/api/invoices', name: 'app_api_invoices', methods: ['GET'])]
-    public function invoices(InvoiceRepository $invoiceRepository, UserRepository $userRepo): Response
-    {
-  
-        $invoices = $invoiceRepository->findAll();
-        $data = [];
-        for($i = 0; $i< count($invoices); $i++){
-            $data[] = [
-                'id' => $invoices[$i]->getId(),
-                'customer_id' => $invoices[$i]->getCustomerId()->getId(),
-                'uuid' => $invoices[$i]->getUuid(),
-                'status' => $invoices[$i]->getStatus(),
-                'created_at' => $invoices[$i]->getCreatedAt(),
-                'due_at' => $invoices[$i]->getDueAt(),
-                'issued_at' => $invoices[$i]->getIssuedAt()
-            ];
-        }
-
-        return $this->json($data, Response::HTTP_OK);      
-    
-    }
 
     
 }
