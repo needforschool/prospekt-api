@@ -33,68 +33,61 @@ class InvoiceController extends AbstractController
     }
     #[Route('/invoiceCreate', name: 'app_invoice_create', methods: ['POST'])]
     public function createInvoice(Request $request,ManagerRegistry $doctrine): Response {
-        $invoice = new invoice();
 
         $data = json_decode($request->getContent(), true);
-
+        // erreur si customer id n'existe pas on boucle sur name et id pour verifier que NN renvoi une bad request
         $user = $doctrine->getRepository(User::class)->find($data['idCustomer']);
-
+        $invoice = new invoice();
         $invoice->setCustomerId($user)
                 ->setStatus($data['name'])
                 ->setCreatedAt(new \DateTimeImmutable());
-
+        // try
         $this->entityManager->persist($invoice);
         $this->entityManager->flush();
-
-        return $this->json(['status' => 'success'], Response::HTTP_OK);
-
+        // catch renvoi erreur 500 "une erreur lors de l'enregistrement c'est produite.."
+        // monolog log le message d'erreur
+        return $this->json(['message' => 'success'], Response::HTTP_OK);
     }
 
     #[Route('/invoiceDelete/{id}', name: 'app_invoice_delete', methods: ['DELETE'])]
-    public function deleteInvoice(Request $request,ManagerRegistry $doctrine, int $id): Response {
+    public function deleteInvoice(Request $request,ManagerRegistry $doctrine, Invoice $id): Response {
 
-        $data = json_decode($request->getContent(), true);
-
-        $user = $doctrine->getRepository(User::class)->find($data['idCustomer']);
-
-        $invoice = $doctrine->getRepository(Invoice::class)->find($id);
-
-        $this->entityManager->remove($invoice);
+        // try
+        $this->entityManager->remove($id);
         $this->entityManager->flush();
-        return $this->json(['status' => 'success'], Response::HTTP_OK);
+        //catch
+        return $this->json(['message' => 'success'], Response::HTTP_NO_CONTENT);
 
     }
 
-    #[Route('api/invoiceUpdate/{id}', name: 'app_invoice_update', methods: ['PUT'])]
+    #[Route('invoiceUpdate/{id}', name: 'app_invoice_update', methods: ['PATCH'])]
     public function updateInvoice(Request $request,ManagerRegistry $doctrine, int $id): Response {
 
 
         $data = json_decode($request->getContent(), true);
 
-        $user = $doctrine->getRepository(User::class)->find($data['idCustomer']);
-        $invoice = $doctrine->getRepository(Invoice::class)->find($id);
+        $invoice = $doctrine->getRepository(Invoice::class)->find($id);// redeclarer le $invoice
 
         if (isset($data['status'])) {
             $invoice->setStatus($data['status']);
         }
 
         if (isset($data['dueAt'])) {
-        $invoice->setDueAt(DateTimeImmutable::createFromFormat('Y-m-d',$data['dueAt']));
+            $invoice->setDueAt(DateTimeImmutable::createFromFormat('Y-m-d',$data['dueAt']));
         }
 
         if (isset($data['issueAt'])) {
             $invoice->setIssuedAt(DateTimeImmutable::createFromFormat('Y-m-d',$data['issueAt']));
         }
-
+        // try
         $this->entityManager->flush();
-
-        return $this->json(['status' => 'success'], Response::HTTP_OK);
+        // catch
+        return $this->json(['message' => 'success'], Response::HTTP_OK);
     }
 
     #[Route('/invoices/{id}', name: 'app_api_invoices', methods: ['GET'])]
     public function getMyInvoices(InvoiceRepository $invoiceRepository, UserRepository $userRepo, ManagerRegistry $doctrine, $id): Response
     {
-        $user = $doctrine->getRepository(User::class)->find($id);
         $invoices = $invoiceRepository->findAll();
         $data = [];
         for($i = 0; $i< count($invoices); $i++){
