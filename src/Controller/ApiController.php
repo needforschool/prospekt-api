@@ -237,6 +237,25 @@ class ApiController extends AbstractController
 
     }
 
+    #[Route('/api/amountinvoice/{id}', name: 'app_api_amountinvoice', methods: ['GET'])]
+    public function sumAmountItemByInvoiceId(InvoiceRepository $invoiceRepository, $id): Response
+    {
+        if (!$invoiceRepository->find($id)) {
+            throw $this->createNotFoundException(
+                'No invoice found with id '.$id
+            );
+        }
+        $invoice = $invoiceRepository->find($id);
+        $items = $invoice->getInvoiceItems();
+        $amount = 0;
+        foreach ($items as $item) {
+            
+            $amount = $amount + $item->getAmount();
+        }
+        
+        return $this->json($amount, Response::HTTP_OK);   
+    }
+
 
 
     #[Route('/api/add/invoiceitem', name: 'app_api_add_invoiceitem', methods: ['POST'])]
