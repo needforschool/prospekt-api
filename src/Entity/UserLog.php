@@ -14,10 +14,10 @@ class UserLog
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'userLogsAuthor')]
-    private ?user $author_id = null;
+    private ?User $author_id = null;
 
     #[ORM\ManyToOne(inversedBy: 'userLogsTarget')]
-    private ?user $target_id = null;
+    private ?User $target_id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $type = null;
