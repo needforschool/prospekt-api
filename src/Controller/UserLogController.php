@@ -60,36 +60,16 @@ class UserLogController extends AbstractController
         return $this->json(['message' => 'success'], Response::HTTP_OK);
     }
 
-    // recupere les log d'un client grâce à son id
+    // recupere les logs d'un client grâce à son id
     #[Route('/users/{id}/logs', name: 'app_user_log_get', methods: ['GET'])]
     public function getLog($id,ManagerRegistry $doctrine): Response {
 
-        dump($id);
-        $userLog  = $doctrine->getRepository(UserLog::class)->findAll();
-        dump ($userLog);
-       /* $target = $doctrine->getRepository(User::class)->find($data['idTarget']);
-        if($target === null){
-            return $this->json(['message' => 'target introuvable'], Response::HTTP_BAD_REQUEST);
+        $userLog  = $doctrine->getRepository(UserLog::class)->getLogByTargetId($id);
+
+        if(empty($userLog)){
+            return $this->json(["message" => "Pas de log"], Response::HTTP_BAD_REQUEST);
         }
 
-        $author = $doctrine->getRepository(User::class)->find($data['authorId']);
-        if($author === null ){
-            return $this->json(['message' => 'author introuvable'], Response::HTTP_BAD_REQUEST);
-        }
-
-        $userLog = new userLog();
-        $userLog->setAuthorId($author)
-            ->setTargetId($target)
-            ->setType($data["type"])
-            ->setContent($data['content'])
-            ->setCreatedAt(new \DateTimeImmutable());
-        try{
-            $this->entityManager->persist($userLog);
-            $this->entityManager->flush();
-        }catch(\Exception $e){
-            return $this->json($e->getMessage(), 500);
-        }*/
-
-        return $this->json(['message' => 'success'], Response::HTTP_OK);
+        return $this->json($userLog, Response::HTTP_OK);
     }
 }

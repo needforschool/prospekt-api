@@ -39,6 +39,18 @@ class UserLogRepository extends ServiceEntityRepository
         }
     }
 
+    public function getLogByTargetId($id){
+        $conn = $this->getEntityManager()->getConnection();
+        $sql = '
+            SELECT * FROM user_log u
+            WHERE u.target_id_id =  :id 
+            ';
+        $stmt = $conn->prepare($sql);
+        $resultSet = $stmt->executeQuery(['id' => $id]);
+
+        return $resultSet->fetchAllAssociative();
+    }
+
 //    /**
 //     * @return UserLog[] Returns an array of UserLog objects
 //     */
