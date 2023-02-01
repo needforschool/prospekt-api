@@ -16,7 +16,7 @@ class Invoice
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'invoicesId')]
-    private ?user $customer_id = null;
+    private ?User $customer_id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $uuid = null;
