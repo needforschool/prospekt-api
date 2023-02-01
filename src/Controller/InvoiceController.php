@@ -35,26 +35,32 @@ class InvoiceController extends AbstractController
     public function createInvoice(Request $request,ManagerRegistry $doctrine): Response {
 
         $data = json_decode($request->getContent(), true);
-        // erreur si customer id n'existe pas on boucle sur name et id pour verifier que NN renvoi une bad request
+
         $user = $doctrine->getRepository(User::class)->find($data['idCustomer']);
         $invoice = new invoice();
         $invoice->setCustomerId($user)
                 ->setStatus($data['name'])
                 ->setCreatedAt(new \DateTimeImmutable());
-        // try
-        $this->entityManager->persist($invoice);
-        $this->entityManager->flush();
-        // catch renvoi erreur 500 "une erreur lors de l'enregistrement c'est produite.."
-        // monolog log le message d'erreur
+        try{
+            $this->entityManager->persist($invoice);
+            $this->entityManager->flush();
+        }catch(\Exception $e){
+            return $this->json($e->getMessage(), 500);
+        }
+
         return $this->json(['message' => 'success'], Response::HTTP_OK);
     }
 
     #[Route('/invoiceDelete/{id}', name: 'app_invoice_delete', methods: ['DELETE'])]
     public function deleteInvoice(Request $request,ManagerRegistry $doctrine, Invoice $id): Response {
 
-        // try
-        $this->entityManager->remove($id);
-        $this->entityManager->flush();
+        try{
+            $this->entityManager->remove($id);
+            $this->entityManager->flush();
+        }catch(\Exception $e){
+            return  $this->json($e->getMessage(),500);
+        }
+
         //catch
         return $this->json(['message' => 'success'], Response::HTTP_NO_CONTENT);
 
@@ -79,9 +85,13 @@ class InvoiceController extends AbstractController
         if (isset($data['issueAt'])) {
             $invoice->setIssuedAt(DateTimeImmutable::createFromFormat('Y-m-d',$data['issueAt']));
         }
-        // try
-        $this->entityManager->flush();
-        // catch
+
+        try{
+            $this->entityManager->flush();
+        }catch(\Exception $e){
+            return $this->json($e->getMessage(),500);
+        }
+
         return $this->json(['message' => 'success'], Response::HTTP_OK);
     }
 
