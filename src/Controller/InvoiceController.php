@@ -23,6 +23,30 @@ class InvoiceController extends AbstractController
     public function __construct(ManagerRegistry $doctrine){
         $this->entityManager = $doctrine->getManager();
     }
+
+    // get all invoices
+
+    #[Route('/invoices', name: 'app_invoices', methods: ['GET'])]
+    public function invoices(InvoiceRepository $invoiceRepository): Response
+    {
+        $invoices = $invoiceRepository->findAll();
+        $data = [];
+        for($i = 0; $i < count($invoices); $i++) {
+            $data[] = [
+                'id'          => $invoices[$i]->getId(),
+                'customer_id' => $invoices[$i]->getCustomerId()->getId(),
+                'uuid'        => $invoices[$i]->getUuid(),
+                'status'      => $invoices[$i]->getStatus(),
+                'created_at'  => $invoices[$i]->getCreatedAt(),
+                'due_at'      => $invoices[$i]->getDueAt(),
+                'issued_at'   => $invoices[$i]->getIssuedAt()
+            ];
+        }
+
+        return $this->json($data, Response::HTTP_OK);
+
+    }
+
     #[Route('/invoice', name: 'app_invoice')]
     public function index(): JsonResponse
     {
@@ -31,7 +55,10 @@ class InvoiceController extends AbstractController
             'path' => 'src/Controller/InvoiceController.php',
         ]);
     }
-    #[Route('/invoiceCreate', name: 'app_invoice_create', methods: ['POST'])]
+
+    //create invoice
+
+    #[Route('/invoice/Create', name: 'app_invoice_create', methods: ['POST'])]
     public function createInvoice(Request $request,ManagerRegistry $doctrine): Response {
 
         $data = json_decode($request->getContent(), true);
@@ -41,6 +68,7 @@ class InvoiceController extends AbstractController
         $invoice->setCustomerId($user)
                 ->setStatus($data['name'])
                 ->setCreatedAt(new \DateTimeImmutable());
+
         try{
             $this->entityManager->persist($invoice);
             $this->entityManager->flush();
@@ -95,25 +123,33 @@ class InvoiceController extends AbstractController
         return $this->json(['message' => 'success'], Response::HTTP_OK);
     }
 
-    #[Route('/invoices/{id}', name: 'app_api_invoices', methods: ['GET'])]
-    public function getMyInvoices(InvoiceRepository $invoiceRepository, UserRepository $userRepo, ManagerRegistry $doctrine, $id): Response
+    // get invoice selon son id
+
+    #[Route('/invoice/{id}', name: 'app_api_invoice_id', methods: ['GET'])]
+    public function invoiceById(InvoiceRepository $invoiceRepository, $id): Response
     {
-        $invoices = $invoiceRepository->findAll();
-        $data = [];
-        for($i = 0; $i< count($invoices); $i++){
-            $data[] = [
-                'id' => $invoices[$i]->getId(),
-                'customer_id' => $invoices[$i]->getCustomerId()->getId(),
-                'uuid' => $invoices[$i]->getUuid(),
-                'status' => $invoices[$i]->getStatus(),
-                'created_at' => $invoices[$i]->getCreatedAt(),
-                'due_at' => $invoices[$i]->getDueAt(),
-                'issued_at' => $invoices[$i]->getIssuedAt()
-            ];
+        if (!$invoiceRepository->find($id)) {
+            throw $this->createNotFoundException(
+                'No invoice found with id '.$id
+            );
         }
 
-        return $this->json($data, Response::HTTP_OK);
+        $invoice = $invoiceRepository->find($id);
+        $data = [];
 
+        $data[] = [
+            'id' => $invoice->getId(),
+            'customer_id' => $invoice->getCustomerId()->getId(),
+            'uuid' => $invoice->getUuid(),
+            'status' => $invoice->getStatus(),
+            'created_at' => $invoice->getCreatedAt(),
+            'due_at' => $invoice->getDueAt(),
+            'issued_at' => $invoice->getIssuedAt()
+        ];
+
+        return $this->json($data, Response::HTTP_OK);
     }
 
+
+    // to do ajout de getInvoiceByCustomerId
 }
