@@ -248,7 +248,7 @@ class ApiController extends AbstractController
         $invoice = $invoiceRepository->find($id);
         $items = $invoice->getInvoiceItems();
         $amount = 0;
-        foreach ($items as $item) {
+        foreach ($items as $item) { 
             
             $amount = $amount + $item->getAmount();
         }

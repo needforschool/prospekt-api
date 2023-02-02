@@ -23,7 +23,7 @@
                             </div>
                         {% endfor %}
   
-                        <form id='checkout-form' method='post' action="{{ path('app_stripe_charge') }}">             
+                        <form id='checkout-form' method='post' action="{{ path('app_stripe_charge', {id: id.id}) }}">             
                             <input type='hidden' name='stripeToken' id='stripe-token-id'>                              
                             <label for="card-element" class="mb-5">Formulaire de vérification</label>
                             <br>
