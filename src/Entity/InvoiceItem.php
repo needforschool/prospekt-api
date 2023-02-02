@@ -15,7 +15,7 @@ class InvoiceItem
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'invoiceItems')]
-    private ?invoice $invoice_id = null;
+    private ?Invoice $invoice_id = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $name = null;
