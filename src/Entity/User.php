@@ -3,32 +3,38 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-class User
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $type = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 180, unique: true)]
     private ?string $email = null;
+
+    #[ORM\Column]
+    private array $roles = [];
+
+    /**
+     * @var string The hashed password
+     */
+    #[ORM\Column]
+    private ?string $password = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $type = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $tel = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 255)]
     private ?string $name = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $password = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $token = null;
@@ -36,46 +42,18 @@ class User
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $siret = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?float $vat = null;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $vat = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $updated_at = null;
-
-    #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $created_at = null;
-
-    #[ORM\OneToMany(mappedBy: 'author_id', targetEntity: UserLog::class)]
-    private Collection $userLogsAuthor;
-
-    #[ORM\OneToMany(mappedBy: 'target_id', targetEntity: UserLog::class)]
-    private Collection $userLogsTarget;
-
-    #[ORM\OneToMany(mappedBy: 'customer_id', targetEntity: Invoice::class)]
-    private Collection $invoicesId;
-
-    public function __construct()
-    {
-        $this->userLogsAuthor = new ArrayCollection();
-        $this->userLogsTarget = new ArrayCollection();
-        $this->invoicesId = new ArrayCollection();
-    }
+    private ?\DateTimeImmutable $updateAt = null;
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getType(): ?string
-    {
-        return $this->type;
-    }
-
-    public function setType(?string $type): self
-    {
-        $this->type = $type;
-
-        return $this;
     }
 
     public function getEmail(): ?string
@@ -83,9 +61,74 @@ class User
         return $this->email;
     }
 
-    public function setEmail(?string $email): self
+    public function setEmail(string $email): self
     {
         $this->email = $email;
+
+        return $this;
+    }
+
+    /**
+     * A visual identifier that represents this user.
+     *
+     * @see UserInterface
+     */
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->email;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+        // guarantee every user at least has ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+
+    public function setRoles(array $roles): self
+    {
+        $this->roles = $roles;
+
+        return $this;
+    }
+
+    /**
+     * @see PasswordAuthenticatedUserInterface
+     */
+    public function getPassword(): string
+    {
+        return $this->password;
+    }
+
+    public function setPassword(string $password): self
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function eraseCredentials()
+    {
+        // If you store any temporary, sensitive data on the user, clear it here
+        // $this->plainPassword = null;
+    }
+
+    public function getType(): ?string
+    {
+        return $this->type;
+    }
+
+    public function setType(string $type): self
+    {
+        $this->type = $type;
 
         return $this;
     }
@@ -107,21 +150,9 @@ class User
         return $this->name;
     }
 
-    public function setName(?string $name): self
+    public function setName(string $name): self
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    public function getPassword(): ?string
-    {
-        return $this->password;
-    }
-
-    public function setPassword(?string $password): self
-    {
-        $this->password = $password;
 
         return $this;
     }
@@ -150,148 +181,39 @@ class User
         return $this;
     }
 
-    public function getVat(): ?float
+    public function getVat(): ?string
     {
         return $this->vat;
     }
 
-    public function setVat(?float $vat): self
+    public function setVat(?string $vat): self
     {
         $this->vat = $vat;
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeImmutable
-    {
-        return $this->updated_at;
-    }
-
-    public function setUpdatedAt(?\DateTimeImmutable $updated_at): self
-    {
-        $this->updated_at = $updated_at;
-
-        return $this;
-    }
-
     public function getCreatedAt(): ?\DateTimeImmutable
     {
-        return $this->created_at;
+        return $this->createdAt;
     }
 
-    public function setCreatedAt(?\DateTimeImmutable $created_at): self
+    public function setCreatedAt(\DateTimeImmutable $createdAt): self
     {
-        $this->created_at = $created_at;
+        $this->createdAt = $createdAt;
 
         return $this;
     }
 
-    /**
-     * @return Collection<int, UserLog>
-     */
-    public function getUserLogsAuthor(): Collection
+    public function getUpdateAt(): ?\DateTimeImmutable
     {
-        return $this->userLogsAuthor;
+        return $this->updateAt;
     }
 
-    public function addUserLogsAuthor(UserLog $userLogsAuthor): self
+    public function setUpdateAt(?\DateTimeImmutable $updateAt): self
     {
-        if (!$this->userLogsAuthor->contains($userLogsAuthor)) {
-            $this->userLogsAuthor->add($userLogsAuthor);
-            $userLogsAuthor->setAuthorId($this);
-        }
+        $this->updateAt = $updateAt;
 
         return $this;
     }
-
-    public function removeUserLogsAuthor(UserLog $userLogsAuthor): self
-    {
-        if ($this->userLogsAuthor->removeElement($userLogsAuthor)) {
-            // set the owning side to null (unless already changed)
-            if ($userLogsAuthor->getAuthorId() === $this) {
-                $userLogsAuthor->setAuthorId(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, UserLog>
-     */
-    public function getUserLogsTarget(): Collection
-    {
-        return $this->userLogsTarget;
-    }
-
-    public function addUserLogsTarget(UserLog $userLogsTarget): self
-    {
-        if (!$this->userLogsTarget->contains($userLogsTarget)) {
-            $this->userLogsTarget->add($userLogsTarget);
-            $userLogsTarget->setTargetId($this);
-        }
-
-        return $this;
-    }
-
-    public function removeUserLogsTarget(UserLog $userLogsTarget): self
-    {
-        if ($this->userLogsTarget->removeElement($userLogsTarget)) {
-            // set the owning side to null (unless already changed)
-            if ($userLogsTarget->getTargetId() === $this) {
-                $userLogsTarget->setTargetId(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Invoice>
-     */
-    public function getInvoicesId(): Collection
-    {
-        return $this->invoicesId;
-    }
-
-    public function addInvoicesId(Invoice $invoicesId): self
-    {
-        if (!$this->invoicesId->contains($invoicesId)) {
-            $this->invoicesId->add($invoicesId);
-            $invoicesId->setCustomerId($this);
-        }
-
-        return $this;
-    }
-
-    public function removeInvoicesId(Invoice $invoicesId): self
-    {
-        if ($this->invoicesId->removeElement($invoicesId)) {
-            // set the owning side to null (unless already changed)
-            if ($invoicesId->getCustomerId() === $this) {
-                $invoicesId->setCustomerId(null);
-            }
-        }
-
-        return $this;
-    }
-
-    public function getInfos() {
-        return array(
-            'id'      => $this->getId(),
-            'type'   => $this->getType(),
-            'email' => $this->getEmail(),
-            'tel' => $this->getTel(),
-            'name' => $this->getName(),
-            'password' => $this->getPassword(),
-            'token' => $this->getToken(),
-            'siret' => $this->getSiret(),
-            'vat' => $this->getVat(),
-            'updated_at' => $this->getUpdatedAt(),
-            'created_at' => $this->getCreatedAt()
-
-        );
-    }
-
-    
 }
