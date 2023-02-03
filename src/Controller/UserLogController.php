@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Invoice;
 use App\Entity\User;
 use App\Entity\UserLog;
+use App\Repository\UserLogRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use mysql_xdevapi\Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,13 +22,26 @@ class UserLogController extends AbstractController
         $this->entityManager = $doctrine->getManager();
     }
 
-    #[Route('/user/log', name: 'app_user_log')]
-    public function index(): JsonResponse
+
+
+    #[Route('/usersLog', name: 'app_users_log', methods: ['GET'])]
+    public function index(UserLogRepository $userLogRepository): Response
     {
-        return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/UserLogController.php',
-        ]);
+
+        $usersLog = $userLogRepository->findAll();
+
+        for($i = 0; $i < count($usersLog); $i++){
+            $data[] = [
+                'id'            => $usersLog[$i]->getId(),
+                'author_id'     => $usersLog[$i]->getAuthorId(),
+                'target_id'     => $usersLog[$i]->getTargetId(),
+                'type'          => $usersLog[$i]->getType(),
+                'content'       => $usersLog[$i]->getContent(),
+                'created_at'    => $usersLog[$i]->getCreatedAt()
+            ];
+        }
+        return $this->json($data, Response::HTTP_OK);
+
     }
     #[Route('/UserLogCreate', name: 'app_user_log_create', methods: ['POST'])]
     public function createLog(Request $request,ManagerRegistry $doctrine): Response {
