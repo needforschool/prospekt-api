@@ -13,7 +13,7 @@ use DateTimeImmutable;
 
 class UserController extends AbstractController
 {
-    #[Route('/api/users', name: 'app_api_users', methods: ['GET'])]
+    #[Route('/users', name: 'app_users', methods: ['GET'])]
     public function index(UserRepository $userRepository): Response
     {
 
